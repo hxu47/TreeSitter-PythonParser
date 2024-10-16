@@ -20,7 +20,7 @@ A Java program, running in Maven and utilizing Java bindings for the Tree-sitter
    </dependency>
    ```
 
-2. Build the core tree-sitter library:
+2. Build the core tree-sitter library locally in your computer (not in this project)
    ```
    git clone https://github.com/tree-sitter/tree-sitter.git
    cd tree-sitter
@@ -28,7 +28,7 @@ A Java program, running in Maven and utilizing Java bindings for the Tree-sitter
    ```
    This will produce `libtree-sitter.dylib`. Copy this file to the root of your project.
 
-3. Build the Python-specific tree-sitter library:
+3. Build the Python-specific tree-sitter library locally in your computer (not in this project)
    ```
    git clone https://github.com/tree-sitter/tree-sitter-python.git
    cd tree-sitter-python
