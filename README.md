@@ -10,7 +10,7 @@ A Java program, running in Maven and utilizing Java bindings for the Tree-sitter
 
 ## Setup
 
-1. Maven dependency for tree-sitter-java: https://central.sonatype.com/artifact/io.github.tree-sitter/jtreesitter/overview
+1. Maven dependency for tree-sitter-java: https://central.sonatype.com/artifact/io.github.tree-sitter/jtreesitter/overview.
    Add this snippets to pom.xml:
    ```
    <dependency>
