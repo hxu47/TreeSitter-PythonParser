@@ -26,7 +26,7 @@ A Java program, running in Maven and utilizing Java bindings for the Tree-sitter
    cd tree-sitter
    make
    ```
-   This will produce libtree-sitter.dylib. Copy this file to the root of your project.
+   This will produce `libtree-sitter.dylib`. Copy this file to the root of your project.
 
 3. Build the Python-specific tree-sitter library:
    ```
@@ -35,7 +35,7 @@ A Java program, running in Maven and utilizing Java bindings for the Tree-sitter
    cc -c -I./src src/parser.c
    cc -shared -I./src src/parser.c src/scanner.c -o libtree-sitter-python.dylib
    ```
-   This will produce libtree-sitter-python.dylib. Copy it to `src/main/resources/native/macos/` in your project.
+   This will produce `libtree-sitter-python.dylib`. Copy it to `src/main/resources/native/macos/` in your project.
 
 
 4. Update your `pom.xml` to include the native library directory:
