@@ -9,11 +9,15 @@ public class ASTUtils {
         public String type;
         public String fieldName;
         public List<ASTNode> children;
+        public Point startPoint;
+        public Point endPoint;
 
-        public ASTNode(String type, String fieldName) {
+        public ASTNode(String type, String fieldName, Point startPoint, Point endPoint) {
             this.type = type;
             this.fieldName = fieldName;
             this.children = new ArrayList<>();
+            this.startPoint = startPoint;
+            this.endPoint = endPoint;
         }
 
         public void addChild(ASTNode child) {
@@ -28,9 +32,12 @@ public class ASTUtils {
     }
 
     private static ASTNode buildNodeWithCursor(TreeCursor cursor) {
-        String nodeType = cursor.getCurrentNode().getType();
+        Node currentNode = cursor.getCurrentNode();
+        String nodeType = currentNode.getType();
         String fieldName = cursor.getCurrentFieldName();
-        ASTNode node = new ASTNode(nodeType, fieldName);
+        Point startPoint = currentNode.getStartPoint();
+        Point endPoint = currentNode.getEndPoint();
+        ASTNode node = new ASTNode(nodeType, fieldName, startPoint, endPoint);
 
         if (cursor.gotoFirstChild()) {
             do {
@@ -42,12 +49,27 @@ public class ASTUtils {
         return node;
     }
 
-    public static void printAST(ASTNode node, int depth) {
+    public static String generateASTOutput(ASTNode node, int depth) {
+        StringBuilder sb = new StringBuilder();
         String indent = "  ".repeat(depth);
-        String fieldInfo = node.fieldName != null ? " (" + node.fieldName + ")" : "";
-        System.out.printf("%s%s%s\n", indent, node.type, fieldInfo);
+
+        sb.append(indent).append(node.type)
+                .append(" [").append(node.startPoint.row()).append(", ").append(node.startPoint.column()).append("] - ")
+                .append("[").append(node.endPoint.row()).append(", ").append(node.endPoint.column()).append("]\n");
+
         for (ASTNode child : node.children) {
-            printAST(child, depth + 1);
+            if (child.fieldName != null && !child.fieldName.isEmpty()) {
+                sb.append(indent).append("  ").append(child.fieldName).append(":\n");
+                if (child.type.equals("argument_list")) {
+                    sb.append(generateASTOutput(child, depth + 1));
+                } else {
+                    sb.append(generateASTOutput(child, depth + 2));
+                }
+            } else {
+                sb.append(generateASTOutput(child, depth + 1));
+            }
         }
+
+        return sb.toString();
     }
 }
