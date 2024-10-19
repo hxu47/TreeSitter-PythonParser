@@ -1,10 +1,8 @@
 import io.github.treesitter.jtreesitter.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ASTUtils {
-
     public static class ASTNode {
         public String type;
         public String fieldName;
@@ -37,39 +35,45 @@ public class ASTUtils {
         String fieldName = cursor.getCurrentFieldName();
         Point startPoint = currentNode.getStartPoint();
         Point endPoint = currentNode.getEndPoint();
+
         ASTNode node = new ASTNode(nodeType, fieldName, startPoint, endPoint);
 
         if (cursor.gotoFirstChild()) {
             do {
-                node.addChild(buildNodeWithCursor(cursor));
+                ASTNode childNode = buildNodeWithCursor(cursor);
+                if (childNode != null) {
+                    node.addChild(childNode);
+                }
             } while (cursor.gotoNextSibling());
             cursor.gotoParent();
         }
 
-        return node;
+        // Only return the node if it's named
+        if (currentNode.isNamed()) {
+            return node;
+        }
+        // If this node is not named but has children, return its children
+        else if (!node.children.isEmpty()) {
+            return node.children.size() == 1 ? node.children.get(0) : node;
+        }
+        return null;
     }
 
-    public static String generateASTOutput(ASTNode node, int depth) {
+    public static String printAST(ASTNode node, int depth) {
         StringBuilder sb = new StringBuilder();
-        String indent = "  ".repeat(depth);
-
-        sb.append(indent).append(node.type)
-                .append(" [").append(node.startPoint.row()).append(", ").append(node.startPoint.column()).append("] - ")
-                .append("[").append(node.endPoint.row()).append(", ").append(node.endPoint.column()).append("]\n");
-
-        for (ASTNode child : node.children) {
-            if (child.fieldName != null && !child.fieldName.isEmpty()) {
-                sb.append(indent).append("  ").append(child.fieldName).append(":\n");
-                if (child.type.equals("argument_list")) {
-                    sb.append(generateASTOutput(child, depth + 1));
-                } else {
-                    sb.append(generateASTOutput(child, depth + 2));
-                }
-            } else {
-                sb.append(generateASTOutput(child, depth + 1));
-            }
-        }
-
+        printASTHelper(node, depth, sb);
         return sb.toString();
+    }
+
+    private static void printASTHelper(ASTNode node, int depth, StringBuilder sb) {
+        String indent = "  ".repeat(depth);
+        String fieldInfo = node.fieldName != null ? node.fieldName + ": " : "";
+        String positionInfo = String.format("[%d, %d] - [%d, %d]",
+                node.startPoint.row(), node.startPoint.column(),
+                node.endPoint.row(), node.endPoint.column());
+        sb.append(String.format("%s%s%s %s\n", indent, fieldInfo, node.type, positionInfo));
+        for (ASTNode child : node.children) {
+            printASTHelper(child, depth + 1, sb);
+        }
     }
 }
